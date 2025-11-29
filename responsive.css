@@ -1,0 +1,317 @@
+/* Адаптивный дизайн для мобильных устройств */
+
+/* Планшеты и маленькие ноутбуки */
+@media (max-width: 1024px) {
+    .main-content {
+        padding: 15px;
+    }
+
+    .subscription-cards {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .header h1 {
+        font-size: 18px;
+    }
+
+    .user-balance {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+}
+
+/* Большие смартфоны */
+@media (max-width: 768px) {
+    .page-header h2 {
+        font-size: 20px;
+    }
+
+    .subscription-card {
+        padding: 15px;
+    }
+
+    .subscription-price {
+        font-size: 20px;
+    }
+
+    .referral-stats {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .payment-method {
+        padding: 12px;
+    }
+
+    .payment-icon {
+        font-size: 20px;
+    }
+}
+
+/* Смартфоны */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 10px;
+    }
+
+    .header {
+        padding: 10px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .back-btn {
+        align-self: flex-start;
+    }
+
+    .subscription-cards {
+        gap: 10px;
+    }
+
+    .subscription-card {
+        padding: 12px;
+    }
+
+    .subscription-card h3 {
+        font-size: 16px;
+    }
+
+    .subscription-price {
+        font-size: 18px;
+    }
+
+    .buy-btn, .nav-btn, .share-btn, .submit-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .referral-link {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .referral-link code {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .copy-btn {
+        width: 100%;
+    }
+
+    .payment-methods {
+        gap: 8px;
+    }
+
+    .payment-method {
+        padding: 10px;
+    }
+
+    .payment-info h4 {
+        font-size: 14px;
+    }
+
+    .payment-info p {
+        font-size: 12px;
+    }
+
+    .upload-area {
+        padding: 30px 15px;
+    }
+
+    .upload-icon {
+        font-size: 36px;
+    }
+
+    .upload-text {
+        font-size: 14px;
+    }
+
+    .upload-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .requisites {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .bottom-nav {
+        padding: 8px 0;
+    }
+
+    .nav-item {
+        font-size: 10px;
+    }
+
+    .nav-item span:first-child {
+        font-size: 18px;
+    }
+}
+
+/* Очень маленькие смартфоны */
+@media (max-width: 320px) {
+    .main-content {
+        padding: 8px;
+    }
+
+    .subscription-card {
+        padding: 10px;
+    }
+
+    .page-header h2 {
+        font-size: 18px;
+    }
+
+    .order-price {
+        font-size: 20px;
+    }
+
+    .crypto-pay-btn, .cloudtips-pay-btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Портретный режим */
+@media (max-height: 700px) and (orientation: portrait) {
+    .main-content {
+        padding: 10px;
+    }
+
+    .subscription-cards {
+        margin-bottom: 20px;
+    }
+
+    .navigation-buttons {
+        gap: 8px;
+    }
+
+    .referral-stats {
+        margin-bottom: 15px;
+    }
+}
+
+/* Ландшафтный режим */
+@media (max-height: 500px) and (orientation: landscape) {
+    .header {
+        padding: 8px 15px;
+    }
+
+    .main-content {
+        padding: 10px;
+    }
+
+    .page-header {
+        margin-bottom: 15px;
+    }
+
+    .subscription-cards {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+}
+
+/* Высокопиксельные дисплеи */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .subscription-card {
+        border-width: 0.5px;
+    }
+
+    .upload-area {
+        border-width: 1px;
+    }
+}
+
+/* Темная тема (если поддерживается) */
+@media (prefers-color-scheme: dark) {
+    .subscription-card,
+    .referral-link-card,
+    .payment-method,
+    .order-info,
+    .payment-instructions,
+    .file-preview {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+
+    .subscription-card h3,
+    .referral-link-card h3,
+    .payment-info h4 {
+        color: #e2e8f0;
+    }
+
+    .payment-info p {
+        color: #a0aec0;
+    }
+
+    .requisites {
+        background: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .upload-area {
+        background: #4a5568;
+        border-color: #667eea;
+    }
+
+    .upload-text {
+        color: #e2e8f0;
+    }
+
+    .upload-subtext,
+    .upload-info {
+        color: #a0aec0;
+    }
+}
+
+/* Поддержка касаний */
+@media (hover: none) and (pointer: coarse) {
+    .subscription-card:hover {
+        transform: none;
+    }
+
+    .payment-method:hover {
+        transform: none;
+    }
+
+    .nav-btn:active,
+    .buy-btn:active,
+    .share-btn:active {
+        opacity: 0.7;
+    }
+}
+
+/* Ориентация устройства */
+@media (orientation: portrait) {
+    .main-content {
+        padding-bottom: 70px; /* место для нижней навигации */
+    }
+}
+
+@media (orientation: landscape) {
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+    }
+}

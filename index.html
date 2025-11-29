@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Premium Shop</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Шапка приложения -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🛒 Telegram Premium</h1>
+                <div class="user-balance">
+                    <span>Баланс: <span id="balanceAmount">0</span> ₽</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Загрузочный экран -->
+            <div id="loadingScreen" class="loading-screen">
+                <img src="assets/loading.gif" alt="Загрузка" class="loading-gif">
+                <p>Загрузка...</p>
+            </div>
+
+            <!-- Страница выбора подписки -->
+            <div id="subscriptionPage" class="page active">
+                <div class="page-header">
+                    <h2>Выберите подписку</h2>
+                    <p>Получите все преимущества Telegram Premium</p>
+                </div>
+
+                <div class="subscription-cards" id="subscriptionCards">
+                    <!-- Карточки загружаются через JavaScript -->
+                </div>
+
+                <div class="navigation-buttons">
+                    <button class="nav-btn" onclick="app.showPage('referralPage')">
+                        👥 Реферальная программа
+                    </button>
+                    <button class="nav-btn" onclick="app.showPage('instructionPage')">
+                        📖 Инструкция
+                    </button>
+                    <button class="nav-btn" onclick="app.openSupport()">
+                        🛠️ Поддержка
+                    </button>
+                </div>
+            </div>
+
+            <!-- Страница реферальной программы -->
+            <div id="referralPage" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="app.showPage('subscriptionPage')">← Назад</button>
+                    <h2>👥 Реферальная программа</h2>
+                </div>
+
+                <div class="referral-content">
+                    <div class="referral-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="referralsCount">0</span>
+                            <span class="stat-label">Приглашено</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="bonusBalance">0</span>
+                            <span class="stat-label">₽ Баланс</span>
+                        </div>
+                    </div>
+
+                    <div class="referral-link-card">
+                        <h3>Ваша реферальная ссылка</h3>
+                        <div class="referral-link">
+                            <code id="referralLink">Загрузка...</code>
+                            <button class="copy-btn" onclick="app.copyReferralLink()">📋</button>
+                        </div>
+                        <p class="referral-info">
+                            Приглашайте друзей и получайте 10% от их покупок!
+                        </p>
+                    </div>
+
+                    <button class="share-btn" onclick="app.shareReferralLink()">
+                        📤 Поделиться ссылкой
+                    </button>
+                </div>
+            </div>
+
+            <!-- Страница инструкции -->
+            <div id="instructionPage" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="app.showPage('subscriptionPage')">← Назад</button>
+                    <h2>📖 Инструкция по активации</h2>
+                </div>
+
+                <div class="instruction-content">
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Оплатите подписку</h3>
+                            <p>Выберите подписку и способ оплаты</p>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Получите ссылку активации</h3>
+                            <p>После подтверждения оплаты вы получите ссылку</p>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Активируйте Premium</h3>
+                            <p>Нажмите "Активировать Telegram Premium" в открывшемся окне</p>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Готово! 🎉</h3>
+                            <p>Подписка активирована на вашем аккаунте</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Страница выбора способа оплаты -->
+            <div id="paymentMethodsPage" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="app.showPage('subscriptionPage')">← Назад</button>
+                    <h2>💳 Выберите способ оплаты</h2>
+                </div>
+
+                <div class="selected-subscription">
+                    <h3 id="selectedSubscriptionName">3 месяца</h3>
+                    <div class="selected-price" id="selectedSubscriptionPrice">390 ₽</div>
+                </div>
+
+                <div class="payment-methods">
+                    <div class="payment-method" onclick="app.selectPaymentMethod('yoomoney')">
+                        <div class="payment-icon">💵</div>
+                        <div class="payment-info">
+                            <h4>ЮMoney</h4>
+                            <p>Перевод на карту</p>
+                        </div>
+                        <div class="payment-arrow">→</div>
+                    </div>
+
+                    <div class="payment-method" onclick="app.selectPaymentMethod('sbp')">
+                        <div class="payment-icon">📱</div>
+                        <div class="payment-info">
+                            <h4>СБП</h4>
+                            <p>Быстрый перевод</p>
+                        </div>
+                        <div class="payment-arrow">→</div>
+                    </div>
+
+                    <div class="payment-method" onclick="app.selectPaymentMethod('cryptobot')">
+                        <div class="payment-icon">💎</div>
+                        <div class="payment-info">
+                            <h4>CryptoBot</h4>
+                            <p>USDT криптовалюта</p>
+                        </div>
+                        <div class="payment-arrow">→</div>
+                    </div>
+
+                    <div class="payment-method" onclick="app.selectPaymentMethod('cloudtips')">
+                        <div class="payment-icon">☁️</div>
+                        <div class="payment-info">
+                            <h4>CloudTips</h4>
+                            <p>Онлайн платежи</p>
+                        </div>
+                        <div class="payment-arrow">→</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Страница оплаты ЮMoney -->
+            <div id="paymentYoomoneyPage" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="app.showPage('paymentMethodsPage')">← Назад</button>
+                    <h2>💵 Оплата ЮMoney</h2>
+                </div>
+
+                <div class="payment-content">
+                    <div class="order-info">
+                        <h3>Заказ #<span id="yoomoneyOrderId">1001</span></h3>
+                        <div class="order-price" id="yoomoneyPrice">390 ₽</div>
+                    </div>
+
+                    <div class="payment-instructions">
+                        <h4>Инструкция по оплате:</h4>
+                        <ol>
+                            <li>Переведите <strong id="yoomoneyAmount">390 ₽</strong> на карту:</li>
+                        </ol>
+
+                        <div class="requisites-card">
+                            <code class="requisites" id="yoomoneyRequisites">4100 1173 9163 4901</code>
+                            <button class="copy-btn" onclick="app.copyRequisites('yoomoney')">📋 Копировать</button>
+                        </div>
+
+                        <ol start="2">
+                            <li>Сделайте скриншот подтверждения оплаты</li>
+                            <li>Загрузите скриншот ниже</li>
+                        </ol>
+                    </div>
+
+                    <!-- Drag & Drop область для скриншота -->
+                    <div class="upload-section">
+                        <div id="uploadArea" class="upload-area">
+                            <div class="upload-content">
+                                <div class="upload-icon">📸</div>
+                                <p class="upload-text">Перетащите скриншот сюда</p>
+                                <p class="upload-subtext">или</p>
+                                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                                    Выбрать файл
+                                </button>
+                                <p class="upload-info">JPG, PNG до 5MB</p>
+                            </div>
+                            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        </div>
+
+                        <div id="filePreview" class="file-preview" style="display: none;">
+                            <img id="previewImage" src="" alt="Превью">
+                            <div class="file-info">
+                                <span id="fileName">screenshot.jpg</span>
+                                <span id="fileSize">1.2 MB</span>
+                            </div>
+                            <button class="remove-btn" onclick="app.removeFile()">🗑️</button>
+                        </div>
+                    </div>
+
+                    <button id="submitPaymentBtn" class="submit-btn" disabled onclick="app.submitYoomoneyPayment()">
+                        ОТПРАВИТЬ НА ПРОВЕРКУ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Страница оплаты СБП -->
+            <div id="paymentSbpPage" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="app.showPage('paymentMethodsPage')">← Назад</button>
+                    <h2>📱 Оплата СБП</h2>
+                </div>
+
+                <div class="payment-content">
+                    <div class="order-info">
+                        <h3>Заказ #<span id="sbpOrderId">1002</span></h3>
+                        <div class="order-price" id="sbpPrice">390 ₽</div>
+                    </div>
+
+                    <div class="payment-instructions">
+                        <h4>Инструкция по оплате:</h4>
+                        <ol>
+                            <li>Переведите <strong id="sbpAmount">390 ₽</strong> по номеру:</li>
+                        </ol>
+
+                        <div class="requisites-card">
+                            <code class="requisites" id="sbpPhone">+79998887766</code>
+                            <p class="receiver-name">Получатель: <span id="sbpReceiver">Алла Ф.</span></p>
+                            <button class="copy-btn" onclick="app.copyRequisites('sbp')">📋 Копировать</button>
+                        </div>
+
+                        <ol start="2">
+                            <li>Сделайте скриншот подтверждения оплаты</li>
+                            <li>Загрузите скриншот ниже</li>
+                        </ol>
+                    </div>
+
+                    <!-- Та же Drag & Drop область -->
+                    <div class="upload-section">
+                        <div id="uploadAreaSbp" class="upload-area">
+                            <div class="upload-content">
+                                <div class="upload-icon">📸</div>
+                                <p class="upload-text">Перетащите скриншот сюда</p>
+                                <p class="upload-subtext">или</p>
+                                <button class="upload-btn" onclick="document.getElementById('fileInputSbp').click()">
+                                    Выбрать файл
+                                </button>
+                                <p class="upload-info">JPG, PNG до 5MB</p>
+                            </div>
+                            <input type="file" id="fileInputSbp" accept="image/*" style="display: none;">
+                        </div>
+
+                        <div id="filePreviewSbp" class="file-preview" style="display: none;">
+                            <img id="previewImageSbp" src="" alt="Превью">
+                            <div class="file-info">
+                                <span id="fileNameSbp">screenshot.jpg</span>
+                                <span id="fileSizeSbp">1.2 MB</span>
+                            </div>
+                            <button class="remove-btn" onclick="app.removeFile('sbp')">🗑️</button>
+                        </div>
+                    </div>
+
+                    <button id="submitSbpBtn" class="submit-btn" disabled onclick="app.submitSbpPayment()">
+                        ОТПРАВИТЬ НА ПРОВЕРКУ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Страница оплаты CryptoBot -->
+            <div id="paymentCryptobotPage" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="app.showPage('paymentMethodsPage')">← Назад</button>
+                    <h2>💎 Оплата CryptoBot</h2>
+                </div>
+
+                <div class="payment-content">
+                    <div class="order-info">
+                        <h3>Заказ #<span id="cryptoOrderId">1003</span></h3>
+                        <div class="order-price">
+                            <span id="cryptoPriceRub">390 ₽</span>
+                            <span class="crypto-usdt" id="cryptoPriceUsdt">≈ 4.59 USDT</span>
+                        </div>
+                    </div>
+
+                    <div class="crypto-instructions">
+                        <p>Оплатите счет в CryptoBot для завершения заказа</p>
+
+                        <div class="crypto-actions">
+                            <button class="crypto-pay-btn" onclick="app.openCryptoBotInvoice()">
+                                💳 Оплатить в CryptoBot
+                            </button>
+
+                            <button class="crypto-check-btn" onclick="app.checkCryptoPayment()">
+                                🔄 Проверить оплату
+                            </button>
+                        </div>
+
+                        <div class="crypto-status">
+                            <p id="cryptoStatus">Статус: Ожидание оплаты</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Страница оплаты CloudTips -->
+            <div id="paymentCloudtipsPage" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="app.showPage('paymentMethodsPage')">← Назад</button>
+                    <h2>☁️ Оплата CloudTips</h2>
+                </div>
+
+                <div class="payment-content">
+                    <div class="order-info">
+                        <h3>Заказ #<span id="cloudtipsOrderId">1004</span></h3>
+                        <div class="order-price" id="cloudtipsPrice">390 ₽</div>
+                    </div>
+
+                    <div class="cloudtips-instructions">
+                        <p>Для оплаты через CloudTips нажмите кнопку ниже</p>
+
+                        <button class="cloudtips-pay-btn" onclick="app.openCloudTips()">
+                            🔗 Перейти к оплате
+                        </button>
+
+                        <div class="cloudtips-note">
+                            <p>После оплаты вернитесь в это окно</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Нижняя навигация -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="app.showPage('subscriptionPage')">
+                <span>🛒</span>
+                <span>Магазин</span>
+            </button>
+            <button class="nav-item" onclick="app.showPage('referralPage')">
+                <span>👥</span>
+                <span>Рефералы</span>
+            </button>
+            <button class="nav-item" onclick="app.openSupport()">
+                <span>🛠️</span>
+                <span>Поддержка</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="telegram-api.js"></script>
+    <script src="payments.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

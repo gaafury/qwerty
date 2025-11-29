@@ -29,6 +29,11 @@ class TelegramPremiumApp {
             this.updateUI();
             this.hideLoading();
 
+            // Авто-обновление цен каждые 30 секунд
+            setInterval(() => {
+                this.refreshPrices();
+            }, 30000);
+
             console.log('Приложение инициализировано');
 
         } catch (error) {
@@ -72,13 +77,21 @@ class TelegramPremiumApp {
     // Загрузка цен
     async loadPrices() {
         try {
-            // Временные цены (позже будем получать из бота)
-            this.prices = {
-                three_months: 390,
-                six_months: 690,
-                twelve_months: 990
-            };
-
+            // Пытаемся получить цены из бота
+            const userData = await TelegramAPI.requestUserData();
+            if (userData && userData.prices) {
+                this.prices = userData.prices;
+                console.log('Цены загружены из бота:', this.prices);
+            } else {
+                // Используем временные цены
+                this.prices = {
+                    three_months: 390,
+                    six_months: 690,
+                    twelve_months: 990
+                };
+                console.log('Используются цены по умолчанию');
+            }
+            
             this.renderSubscriptionCards();
 
         } catch (error) {
@@ -90,6 +103,16 @@ class TelegramPremiumApp {
                 twelve_months: 990
             };
             this.renderSubscriptionCards();
+        }
+    }
+
+    // Обновление цен
+    async refreshPrices() {
+        try {
+            await this.loadPrices();
+            console.log('Цены обновлены');
+        } catch (error) {
+            console.error('Ошибка обновления цен:', error);
         }
     }
 
@@ -443,6 +466,182 @@ class TelegramPremiumApp {
     showSuccess(message) {
         this.showNotification(message, 'success');
     }
+
+    // Обновить цены
+    async refreshPrices() {
+        try {
+            this.showNotification('Обновляем цены...', 'info');
+            await this.loadPrices();
+            this.showNotification('Цены обновлены!', 'success');
+        } catch (error) {
+            console.error('Ошибка обновления цен:', error);
+            this.showError('Ошибка обновления цен');
+        }
+    }
+
+    // Отправка оплаты ЮMoney
+    async submitYoomoneyPayment() {
+        if (!window.PaymentsManager.currentFile) {
+            this.showNotification('Пожалуйста, загрузите скриншот оплаты', 'error');
+            return;
+        }
+
+        const subscription = this.currentSubscription;
+        if (!subscription) {
+            this.showNotification('Ошибка: не выбрана подписка', 'error');
+            return;
+        }
+
+        try {
+            // Конвертируем файл в base64
+            const base64File = await window.PaymentsManager.fileToBase64(window.PaymentsManager.currentFile);
+
+            const paymentData = {
+                type: 'payment_screenshot',
+                payment_method: 'yoomoney',
+                subscription_type: subscription.period,
+                amount: subscription.price,
+                screenshot: base64File,
+                screenshot_name: window.PaymentsManager.currentFile.name
+            };
+
+            // Отправляем данные в бота
+            const success = TelegramAPI.sendWebAppData('payment_screenshot', paymentData);
+
+            if (success) {
+                this.showNotification('Скриншот отправлен на проверку! Ожидайте подтверждения.', 'success');
+
+                // Сбрасываем форму
+                window.PaymentsManager.removeFile('yoomoney');
+
+                // Возвращаемся на главную страницу
+                setTimeout(() => {
+                    this.showPage('subscriptionPage');
+                }, 2000);
+            } else {
+                this.showNotification('Ошибка отправки. Попробуйте еще раз.', 'error');
+            }
+
+        } catch (error) {
+            console.error('Ошибка отправки оплаты:', error);
+            this.showNotification('Ошибка отправки. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Отправка оплаты СБП
+    async submitSbpPayment() {
+        if (!window.PaymentsManager.currentFile) {
+            this.showNotification('Пожалуйста, загрузите скриншот оплаты', 'error');
+            return;
+        }
+
+        const subscription = this.currentSubscription;
+        if (!subscription) {
+            this.showNotification('Ошибка: не выбрана подписка', 'error');
+            return;
+        }
+
+        try {
+            // Конвертируем файл в base64
+            const base64File = await window.PaymentsManager.fileToBase64(window.PaymentsManager.currentFile);
+
+            const paymentData = {
+                type: 'payment_screenshot',
+                payment_method: 'sbp',
+                subscription_type: subscription.period,
+                amount: subscription.price,
+                screenshot: base64File,
+                screenshot_name: window.PaymentsManager.currentFile.name
+            };
+
+            // Отправляем данные в бота
+            const success = TelegramAPI.sendWebAppData('payment_screenshot', paymentData);
+
+            if (success) {
+                this.showNotification('Скриншот отправлен на проверку! Ожидайте подтверждения.', 'success');
+
+                // Сбрасываем форму
+                window.PaymentsManager.removeFile('sbp');
+
+                // Возвращаемся на главную страницу
+                setTimeout(() => {
+                    this.showPage('subscriptionPage');
+                }, 2000);
+            } else {
+                this.showNotification('Ошибка отправки. Попробуйте еще раз.', 'error');
+            }
+
+        } catch (error) {
+            console.error('Ошибка отправки оплаты:', error);
+            this.showNotification('Ошибка отправки. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Копирование реквизитов
+    copyRequisites(type) {
+        let textToCopy = '';
+
+        if (type === 'yoomoney') {
+            textToCopy = document.getElementById('yoomoneyRequisites')?.textContent || '';
+        } else if (type === 'sbp') {
+            textToCopy = document.getElementById('sbpPhone')?.textContent || '';
+        }
+
+        if (textToCopy) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                this.showNotification('Реквизиты скопированы!', 'success');
+            }).catch(() => {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                this.showNotification('Реквизиты скопированы!', 'success');
+            });
+        }
+    }
+
+    // Удаление файла
+    removeFile(type = 'yoomoney') {
+        window.PaymentsManager.removeFile(type);
+    }
+
+    // Открытие CryptoBot инвойса
+    openCryptoBotInvoice() {
+        const invoiceUrl = this.currentCryptoInvoice?.invoice_url;
+        if (invoiceUrl) {
+            TelegramAPI.openLink(invoiceUrl);
+        } else {
+            this.showNotification('Счет не создан. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Проверка оплаты CryptoBot
+    checkCryptoPayment() {
+        const invoiceId = this.currentCryptoInvoice?.invoice_id;
+        if (!invoiceId) {
+            this.showNotification('Счет не найден', 'error');
+            return;
+        }
+
+        const checkData = {
+            type: 'check_crypto_payment',
+            invoice_id: invoiceId
+        };
+
+        TelegramAPI.sendWebAppData('check_crypto_payment', checkData);
+        this.showNotification('Проверяем статус оплаты...', 'info');
+    }
+
+    // Открытие CloudTips
+    openCloudTips() {
+        // Здесь будет ссылка на CloudTips
+        const cloudtipsUrl = `https://cloudtips.com/payment?amount=${this.currentSubscription?.price || 390}`;
+        TelegramAPI.openLink(cloudtipsUrl);
+        this.showNotification('Переход к оплате CloudTips...', 'info');
+    }
 }
 
 // Глобальные функции для onclick атрибутов
@@ -455,6 +654,12 @@ function showPage(pageId) {
 function openSupport() {
     if (window.app) {
         window.app.openSupport();
+    }
+}
+
+function refreshPrices() {
+    if (window.app) {
+        window.app.refreshPrices();
     }
 }
 
@@ -473,6 +678,12 @@ window.addEventListener('message', (event) => {
             if (data.user_id && window.app) {
                 window.app.userData = { ...window.app.userData, ...data };
                 window.app.updateUI();
+                
+                // Если пришли новые цены, обновляем карточки
+                if (data.prices) {
+                    window.app.prices = data.prices;
+                    window.app.renderSubscriptionCards();
+                }
             }
         }
     } catch (error) {

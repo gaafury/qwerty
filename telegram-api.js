@@ -169,10 +169,20 @@ class TelegramAPI {
             setTimeout(() => {
                 window.removeEventListener('message', handleMessage);
                 reject(new Error('Timeout waiting for user data'));
-            }, 5000);
+            }, 10000);
 
             this.sendData(payload);
         });
+    }
+
+    // Отправка данных оплаты
+    sendPaymentData(paymentData) {
+        return this.sendWebAppData('payment', paymentData);
+    }
+
+    // Проверка статуса платежа
+    checkPaymentStatus(invoiceId) {
+        return this.sendWebAppData('check_payment', { invoice_id: invoiceId });
     }
 }
 
